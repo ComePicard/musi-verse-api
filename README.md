@@ -11,4 +11,18 @@ py ou python selon l'os ou l'installation
 
 `pip install requirements.txt`
 
+Docker de test :
+`docker run --name API_MUSIVERSE -p 3306:3306 -e MYSQL_ROOT_PASSWORD=pwd -d mysql`
+Une connexion à la DB par un moyen quelconque et : 
+`CREATE DATABASE MUSIVERSE_DB`
+
+
+`python API/manage.py makemigrations`
+`python API/manage.py migrate`
+
+`python API/manage.py  createsuperuser --email admin@example.com --username admin`
+
 `py API/manage.py runserver 8000`
+
+se rendre sur http://127.0.0.1:8000/admin/ et tester admin puis {mot de passe} pour voir si la page d'administration apparaît
+
