@@ -18,6 +18,7 @@ Une connexion à la DB par un moyen quelconque et :
 
 
 `python API/manage.py makemigrations`
+
 `python API/manage.py migrate`
 
 `python API/manage.py  createsuperuser --email admin@example.com --username admin`
