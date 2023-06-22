@@ -9,10 +9,10 @@ py ou python selon l'os ou l'installation
 
 `.\env\Scripts\Activate.ps1` (Windows)
 
-`pip install requirements.txt`
+`pip install -r requirements.txt`
 
 Docker de test :
-`docker run --name API_MUSIVERSE -p 3306:3306 -e MYSQL_ROOT_PASSWORD=pwd -d mysql`
+`docker run --name test -p 5432:5432 -e POSTGRES_PASSWORD=pwd -d postgres`
 Une connexion à la DB par un moyen quelconque et : 
 `CREATE DATABASE MUSIVERSE_DB`
 
