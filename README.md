@@ -3,6 +3,7 @@ Projet d'API pour le site web MusiVerse.
 Nécessite une installation de Python (ici 3.10)
 
 py ou python selon l'os ou l'installation
+
 `py -m venv env `
 
 `source env/bin/activate` (Linux)
@@ -13,6 +14,7 @@ py ou python selon l'os ou l'installation
 
 Docker de test :
 `docker run --name test -p 5432:5432 -e POSTGRES_PASSWORD=pwd -d postgres`
+
 Une connexion à la DB par un moyen quelconque et : 
 `CREATE DATABASE MUSIVERSE_DB`
 
