@@ -40,6 +40,18 @@ class Article(models.Model):
     route = models.CharField(default=['route'], max_length=200,unique=True)
 
 
+class Image(models.Model):
+    class Meta:
+        app_label = 'article'
+    image = models.ImageField(upload_to="./images/instruments")
+    name = models.CharField(default=['ImageDefault'], max_length=200, unique=True)
+    descritpion = models.TextField(max_length=10000,
+                                   default="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+
+
+    creation_date = models.DateTimeField(db_comment="Date and time when the image was published", auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
 
 
 

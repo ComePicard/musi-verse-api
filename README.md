@@ -16,7 +16,7 @@ Docker de test :
 `docker run --name test -p 5432:5432 -e POSTGRES_PASSWORD=pwd -d postgres`
 
 Une connexion à la DB par un moyen quelconque et : 
-`CREATE DATABASE MUSIVERSE_DB`
+`CREATE DATABASE test`
 
 
 `python API/manage.py makemigrations`
@@ -25,7 +25,7 @@ Une connexion à la DB par un moyen quelconque et :
 
 `python API/manage.py  createsuperuser --email admin@example.com --username admin`
 
-`py API/manage.py runserver 8000`
+`python API/manage.py runserver 8000`
 
 se rendre sur http://127.0.0.1:8000/admin/ et tester admin puis {mot de passe} pour voir si la page d'administration apparaît
 
