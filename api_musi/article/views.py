@@ -6,7 +6,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Article
+from .models import Article, Image
 
 import json
 
@@ -15,8 +15,7 @@ class ArticleCreate(APIView):
 
     def post(self, request):
         data = request.data
-        print(request.user.id)
-        # data valid
+        #TODO data valid
         if True:
             new_article = Article()
             new_article.name = data['name']
@@ -47,6 +46,24 @@ class ArticleGetInfos(APIView):
 
     def get(self, request, route):
         article = Article.objects.get(route=route)
+        article.views += 1
+        article.save()
         article_dict = model_to_dict(article)
         serialized_data = json.dumps(article_dict, ensure_ascii=False)
         return Response(json.loads(serialized_data))
+
+
+class UploadImageToArticle(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request):
+        data = request.data
+        #TODO data valid
+        if True:
+            new_image = Image()
+            new_image.name = data['name']
+            new_image.image = request.FILES['image']
+            new_image.descritpion = data['descritpion']
+            new_image.author = request.user
+            new_image.article = Article.objects.get(id=data['article'])
+            new_image.save()
+            return Response(f"Image {data['name']} was uploaded")

@@ -38,6 +38,7 @@ class Article(models.Model):
     last_update = models.DateTimeField(db_comment="Last Update", auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
     route = models.CharField(default=['route'], max_length=200,unique=True)
+    views = models.PositiveIntegerField(default=0)
 
 
 class Image(models.Model):
