@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from api_musi.user.views import CreateUserAPIView
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
@@ -27,6 +28,7 @@ import article.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/users/', CreateUserAPIView.as_view(), name='create_user'),
     path('article_create/', article.views.ArticleCreate.as_view()),
     path('article_image_add/', article.views.UploadImageToArticle.as_view()),
     path('articles/', article.views.ArticleGetNames.as_view()),
