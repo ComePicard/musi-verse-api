@@ -43,8 +43,8 @@ class Article(models.Model):
     price_range = ArrayField(
         models.FloatField(max_length=25, blank=True),
         size=2,
-        default=[50, 100]
-    ),
+        default=list
+    )
     creation_date = models.DateTimeField(db_comment="Date and time when the article was published", auto_now_add=True)
     last_update = models.DateTimeField(db_comment="Last Update", auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
