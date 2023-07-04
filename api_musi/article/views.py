@@ -62,8 +62,10 @@ class UploadImageToArticle(APIView):
             new_image = Image()
             new_image.name = data['name']
             new_image.image = request.FILES['image']
-            new_image.descritpion = data['descritpion']
+            new_image.description = data['descritpion']
             new_image.author = request.user
             new_image.article = Article.objects.get(id=data['article'])
             new_image.save()
             return Response(f"Image {data['name']} was uploaded")
+
+
