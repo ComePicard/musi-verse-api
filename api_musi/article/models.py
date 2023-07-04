@@ -4,6 +4,17 @@ from django.db import models
 
 
 # Create your models here.
+class Pro(models.Model):
+    content = models.TextField()
+
+    def __str__(self):
+        return self.content
+
+class Con(models.Model):
+    content = models.TextField()
+
+    def __str__(self):
+        return self.content
 
 class Article(models.Model):
     class Meta:
@@ -39,6 +50,8 @@ class Article(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
     route = models.CharField(default=['route'], max_length=200,unique=True)
     views = models.PositiveIntegerField(default=0)
+    pros = models.ManyToManyField(Pro, blank=True)
+    cons = models.ManyToManyField(Con, blank=True)
 
 
 class Image(models.Model):
