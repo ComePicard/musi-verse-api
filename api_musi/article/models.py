@@ -5,16 +5,18 @@ from django.db import models
 
 # Create your models here.
 class Pro(models.Model):
-    content = models.TextField()
+    content = models.TextField(unique=True)
 
     def __str__(self):
         return self.content
 
 class Con(models.Model):
-    content = models.TextField()
+    content = models.TextField(unique=True)
 
     def __str__(self):
         return self.content
+
+
 
 class Article(models.Model):
     class Meta:
@@ -50,8 +52,7 @@ class Article(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
     route = models.CharField(default=['route'], max_length=200,unique=True)
     views = models.PositiveIntegerField(default=0)
-    pros = models.ManyToManyField(Pro, blank=True)
-    cons = models.ManyToManyField(Con, blank=True)
+
 
 
 class Image(models.Model):
@@ -70,5 +71,19 @@ class Image(models.Model):
 
 
 
+class ArticleCon(models.Model):
+    con = models.ForeignKey(Con, on_delete=models.CASCADE, default=None )
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['con', 'article'], name='unique_article_con')
+        ]
+class ArticlePro(models.Model):
+    pro = models.ForeignKey(Pro, on_delete=models.CASCADE, default=None)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['pro', 'article'], name='unique_article_pro')
+        ]
 
