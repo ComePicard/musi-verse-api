@@ -4,18 +4,6 @@ from django.db import models
 
 
 # Create your models here.
-class Pro(models.Model):
-    content = models.TextField(unique=True)
-
-    def __str__(self):
-        return self.content
-
-class Con(models.Model):
-    content = models.TextField(unique=True)
-
-    def __str__(self):
-        return self.content
-
 
 
 class Article(models.Model):
@@ -68,22 +56,21 @@ class Image(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
 
-
-
-
-class ArticleCon(models.Model):
-    con = models.ForeignKey(Con, on_delete=models.CASCADE, default=None )
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
+class Attribute(models.Model):
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['con', 'article'], name='unique_article_con')
-        ]
-class ArticlePro(models.Model):
-    pro = models.ForeignKey(Pro, on_delete=models.CASCADE, default=None)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
+        app_label = 'article'
+
+    content = models.TextField(unique=True)
+
+class ArticleAttribute(models.Model):
+    ATTRIBUTE_CHOICES = [
+        ('pros', 'Pros'),
+        ('cons', 'Cons'),
+    ]
+
+    attr = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    attribute_type = models.CharField(max_length=4, choices=ATTRIBUTE_CHOICES)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['pro', 'article'], name='unique_article_pro')
-        ]
-
+        app_label = 'article'
