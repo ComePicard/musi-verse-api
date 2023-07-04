@@ -20,7 +20,7 @@ class ArticleCreate(APIView):
             new_article = Article()
             new_article.name = data['name']
             new_article.categories = data['categories']
-            new_article.descritpion = data['descritpion']
+            new_article.description = data['descritpion']
             new_article.price_range = data['price_range']
             new_article.route = data['name'].strip().replace(" ","_").lower()
             new_article.author = request.user
@@ -49,6 +49,7 @@ class ArticleGetInfos(APIView):
         article.views += 1
         article.save()
         article_dict = model_to_dict(article)
+        print(article_dict)
         serialized_data = json.dumps(article_dict, ensure_ascii=False)
         return Response(json.loads(serialized_data))
 

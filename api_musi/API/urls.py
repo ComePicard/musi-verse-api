@@ -28,7 +28,7 @@ import article.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('api/users/', CreateUserAPIView.as_view(), name='create_user'),
+    path('create_user/', CreateUserAPIView.as_view(), name='create_user'),
     path('article_create/', article.views.ArticleCreate.as_view()),
     path('article_image_add/', article.views.UploadImageToArticle.as_view()),
     path('articles/', article.views.ArticleGetNames.as_view()),
