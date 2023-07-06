@@ -33,6 +33,7 @@
         <list>
           <option value="rest_framework.permissions" />
           <option value="rest_framework.IsAuthenticated" />
+          <option value="api_musi.API.urls.article" />
         </list>
       </option>
     </inspection_tool>
