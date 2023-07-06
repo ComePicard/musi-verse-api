@@ -24,8 +24,6 @@ from rest_framework_simplejwt.views import (
 )
 
 import article.views
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -37,6 +35,9 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('attributes/', article.views.CreateAttribute.as_view()),
-    path('attributes/set/',article.views.SetAttribute.as_view())
+    path('attributes/set/', article.views.SetAttribute.as_view()),
+    path('attributes/vote/', article.views.AttributeVoteAPIView.as_view()),
+    path('attributes/<int:attribute_id>/', article.views.SetAttribute.as_view(), name='delete-attribute')
 
 ]
+

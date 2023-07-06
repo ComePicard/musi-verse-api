@@ -69,8 +69,24 @@ class ArticleAttribute(models.Model):
     ]
 
     attr = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,default=1)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     attribute_type = models.CharField(max_length=4, choices=ATTRIBUTE_CHOICES)
 
     class Meta:
         app_label = 'article'
+
+
+class AttributeNote(models.Model):
+    article_attribute = models.ForeignKey(ArticleAttribute, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.upvote and self.downvote:
+            self.upvote = False
+        elif not self.upvote and not self.downvote:
+            self.downvote = False
+
+        super().save(*args, **kwargs)
