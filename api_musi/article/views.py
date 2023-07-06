@@ -20,7 +20,20 @@ class ArticleNamesAPIView(APIView):
         article.views += 1
         article.save()
         article_dict = model_to_dict(article)
-        return Response(article_dict)
+        attrs = ArticleAttribute.objects.all().filter(article=article.id)
+
+        article_attributes = []
+        for art_attr in attrs:
+            attrs_vote = AttributeNote.objects.all().filter(article_attribute=art_attr.id)
+            total_upvotes = AttributeNote.objects.filter(article_attribute=art_attr.id, upvote=True).count()
+            total_downvotes = AttributeNote.objects.filter(article_attribute=art_attr.id, downvote=True).count()
+
+            article_attributes.append({"attribute_name": Attribute.objects.get(id=art_attr.attr.id).content,
+                                       "article_attribute": model_to_dict(art_attr),
+                                       "article_votes": {"votes_diff": total_upvotes - total_downvotes,
+                                                         "downvotes": total_downvotes,
+                                                         "upvotes": total_upvotes}})
+        return Response([article_dict, article_attributes])
 
 
 class ArticleAPIView(APIView):
