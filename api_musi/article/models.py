@@ -40,7 +40,7 @@ class Article(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
     route = models.CharField(default=['route'], max_length=200,unique=True)
     views = models.PositiveIntegerField(default=0)
-
+    verified = models.BooleanField(default=False)
 
 
 class Image(models.Model):

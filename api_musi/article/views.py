@@ -24,9 +24,9 @@ class ArticleNamesAPIView(APIView):
 
 
 class ArticleAPIView(APIView):
-    permission_classes = (permissions.AllowAny,)
-
     def post(self, request):
+        permission_classes = (permissions.IsAuthenticated,)
+
         data = request.data
         # TODO: Perform data validation
 
@@ -42,11 +42,13 @@ class ArticleAPIView(APIView):
         return Response(f"Article {data['name']} created")
 
     def get(self, request):
+        permission_classes = (permissions.AllowAny,)
+
         articles = Article.objects.all()
         result = []
 
         for article in articles:
-            attrs = ArticleAttribute.objects.all().filter(article=article.id)
+            attrs = ArticleAttribute.objects.all().filter(article=article.id, verified=True)
 
             article_attributes = []
             for art_attr in attrs:
@@ -62,6 +64,18 @@ class ArticleAPIView(APIView):
             result.append([model_to_dict(article), article_attributes])
         return Response(result)
 
+    def patch(self, request):
+        permission_classes = (permissions.IsAuthenticated,)
+
+        #if request.user.is_superuser or request.user.groups.filter(name='Moderators').exists():
+        if True:
+            art_attribute_id = request.data.get('article_id')
+            article = Article.objects.get(id=art_attribute_id)
+            article.verified = True
+            article.save()
+            return Response("User is a moderator. Article Verified")
+        else:
+            return Response("User is not authorized to perform this action.", status=status.HTTP_403_FORBIDDEN)
 
 class UploadImageToArticle(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -127,14 +141,14 @@ class SetAttribute(APIView):
             art_attribute = ArticleAttribute.objects.get(id=attribute_id)
             total_upvotes = AttributeNote.objects.filter(article_attribute=art_attribute.id, upvote=True).count()
             total_downvotes = AttributeNote.objects.filter(article_attribute=art_attribute.id, downvote=True).count()
-            if art_attribute.user == request.user and total_downvotes+total_downvotes < 3:
+            if art_attribute.user == request.user and total_downvotes + total_downvotes < 3:
                 art_attribute.delete()
                 return Response('Attribute deleted successfully', status=status.HTTP_200_OK)
         except ArticleAttribute.DoesNotExist:
-                return Response('Attribute not found', status=status.HTTP_404_NOT_FOUND)
+            return Response('Attribute not found', status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-                print(e)
-                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+            print(e)
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class AttributeVoteAPIView(APIView):
