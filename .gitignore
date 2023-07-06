@@ -5,3 +5,4 @@ API/API/
 /.idea/
 __pycache__
 *.pyc
+API/API/__pycache__/
