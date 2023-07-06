@@ -27,28 +27,32 @@ class ArticleAPIView(APIView):
     def post(self, request):
         permission_classes = (permissions.IsAuthenticated,)
 
-        data = request.data
+        name = request.data.get('name')
+        categories = request.data.get('categories')
+        description = request.data.get('description')
+        price_range = request.data.get('price_range')
+
         # TODO: Perform data validation
 
         new_article = Article(
-            name=data['name'],
-            categories=data['categories'],
-            description=data['description'],
-            price_range=data['price_range'],
-            route=data['name'].strip().replace(" ", "_").lower(),
+            name=name,
+            categories=categories,
+            description=description,
+            price_range=price_range,
+            route=name.strip().replace(" ", "_").lower(),
             author=request.user
         )
         new_article.save()
-        return Response(f"Article {data['name']} created")
+        return Response(f"Article {name} created")
 
     def get(self, request):
         permission_classes = (permissions.AllowAny,)
 
-        articles = Article.objects.all()
+        articles = Article.objects.all().filter(verified=True)
         result = []
 
         for article in articles:
-            attrs = ArticleAttribute.objects.all().filter(article=article.id, verified=True)
+            attrs = ArticleAttribute.objects.all().filter(article=article.id)
 
             article_attributes = []
             for art_attr in attrs:
@@ -58,7 +62,8 @@ class ArticleAPIView(APIView):
 
                 article_attributes.append({"attribute_name": Attribute.objects.get(id=art_attr.attr.id).content,
                                            "article_attribute": model_to_dict(art_attr),
-                                           "article_votes": {"downvotes": total_downvotes,
+                                           "article_votes": {"votes_diff" : total_upvotes - total_downvotes,
+                                                            "downvotes": total_downvotes,
                                                              "upvotes": total_upvotes}})
 
             result.append([model_to_dict(article), article_attributes])
@@ -67,40 +72,47 @@ class ArticleAPIView(APIView):
     def patch(self, request):
         permission_classes = (permissions.IsAuthenticated,)
 
-        #if request.user.is_superuser or request.user.groups.filter(name='Moderators').exists():
+        # if request.user.is_superuser or request.user.groups.filter(name='Moderators').exists():
         if True:
-            art_attribute_id = request.data.get('article_id')
-            article = Article.objects.get(id=art_attribute_id)
+            article_id = request.data.get('article_id')
+            article = Article.objects.get(id=article_id)
             article.verified = True
             article.save()
             return Response("User is a moderator. Article Verified")
         else:
             return Response("User is not authorized to perform this action.", status=status.HTTP_403_FORBIDDEN)
 
+
 class UploadImageToArticle(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
-        data = request.data
-        # TODO data valid
+        name = request.data.get('name')
+        image = request.FILES.get('image')
+        description = request.data.get('description')
+        article_id = request.data.get('article')
+
+        # TODO: Perform data validation
+
         if True:
             new_image = Image()
-            new_image.name = data['name']
-            new_image.image = request.FILES['image']
-            new_image.description = data['descritpion']
+            new_image.name = name
+            new_image.image = image
+            new_image.description = description
             new_image.author = request.user
-            new_image.article = Article.objects.get(id=data['article'])
+            new_image.article = Article.objects.get(id=article_id)
             new_image.save()
-            return Response(f"Image {data['name']} was uploaded")
+            return Response(f"Image {name} was uploaded")
 
 
 class CreateAttribute(APIView):
     def post(self, request):
         try:
+            content = request.data.get('content')
             attribute = Attribute()
-            attribute.content = request.data['content']
+            attribute.content = content
             attribute.save()
-            return Response('Added ' + request.data['content'], status=status.HTTP_200_OK)
+            return Response('Added ' + content, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response('Already exists', status=status.HTTP_409_CONFLICT)
@@ -118,16 +130,19 @@ class SetAttribute(APIView):
 
     def post(self, request):
         try:
+            attr_id = request.data.get('attr')
+            attribute_type = request.data.get('attribute_type')
+            article_id = request.data.get('id_article')
 
             art_attribute = ArticleAttribute()
-            art_attribute.attr = Attribute.objects.get(id=request.data['attr'])
-            art_attribute.attribute_type = request.data['attribute_type']
-            art_attribute.article = Article.objects.get(id=request.data['id_article'])
+            art_attribute.attr = Attribute.objects.get(id=attr_id)
+            art_attribute.attribute_type = attribute_type
+            art_attribute.article = Article.objects.get(id=article_id)
             art_attribute.save()
-            return Response('Added ' + request.data['attr'], status=status.HTTP_200_OK)
+            return Response('Added ' + attr_id, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response(e)
+            return Response(str(e))
 
     def get(self, request):
         attributes = ArticleAttribute.objects.all()
