@@ -6,3 +6,4 @@ API/API/
 __pycache__
 *.pyc
 API/API/__pycache__/
+.idea
