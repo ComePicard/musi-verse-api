@@ -29,17 +29,19 @@ class ModeratorMembersView(APIView):
         serializer = UserSerializer(members, many=True)
         return Response(serializer.data)
 
-class ModeratorAdminView(APIView):
+class ModeartorAdd(APIView):
     permission_classes = (permissions.IsAdminUser,)
 
-    def put(self, request):
+    def patch(self, request):
         moderator_group = Group.objects.get(name='Moderator')
         user_id = request.data.get('user_id')
         user = User.objects.get(id=user_id)
         user.groups.add(moderator_group)
-        return Response({'message': 'Role "Moderator" assigned successfully.'})
 
-    def delete(self, request):
+        return Response({'message': 'Role "Moderator" assigned successfully.'})
+class ModeartorRemove(APIView):
+    permission_classes = (permissions.IsAdminUser,)
+    def patch(self, request):
         moderator_group = Group.objects.get(name='Moderator')
         user_id = request.data.get('user_id')
         user = User.objects.get(id=user_id)

@@ -260,3 +260,31 @@ class CommentDetailView(APIView):
             else:
                 return Response("Commentaire est un spam", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
         return Response(serializer.errors, status=400)
+
+class CommentVoteAPIView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        comment_id = request.data.get('comment_id')
+        vote_type = request.data.get('vote_type')  # 'upvote' or 'downvote'
+        comment = Comment.objects.get(id=comment_id)
+
+        try:
+            comment_vote = CommentVote.objects.get(comment=comment, user=request.user)
+
+            if vote_type == 'upvote' and comment_vote.upvote:
+                comment_vote.upvote = False
+            elif vote_type == 'downvote' and comment_vote.downvote:
+                comment_vote.downvote = False
+            else:
+                comment_vote.upvote = vote_type == 'upvote'
+                comment_vote.downvote = vote_type == 'downvote'
+
+        except CommentVote.DoesNotExist:
+            comment_vote = CommentVote(comment=comment, user=request.user)
+            comment_vote.upvote = vote_type == 'upvote'
+            comment_vote.downvote = vote_type == 'downvote'
+
+        comment_vote.save()
+
+        return Response({'message': 'Vote recorded successfully.'})
