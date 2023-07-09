@@ -31,6 +31,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('users/', user.views.CreateUserAPIView.as_view(), name='create_user'),
+    path('moderators/', user.views.ModeratorMembersView.as_view(), name='get_mods'),
+    path('moderators/add/', user.views.ModeartorAdd.as_view(), name='mode_add'),
+    path('moderators/remove/', user.views.ModeartorRemove.as_view(), name='mod_rem'),
     path('articles/image/', article.views.UploadImageToArticle.as_view()),
     path('articles/', article.views.ArticleAPIView.as_view()),
     path('articles/<str:route>', article.views.ArticleNamesAPIView.as_view()),
@@ -42,6 +45,8 @@ urlpatterns = [
     path('attributes/vote/', article.views.AttributeVoteAPIView.as_view()),
     path('attributes/<int:attribute_id>/', article.views.SetAttribute.as_view(), name='delete-attribute'),
     path('articles/<str:route>/comments/',article.views.CommentDetailView.as_view(), name='comment-detail'),
+    path('articles/<str:route>/comments/vote/', article.views.CommentVoteAPIView.as_view(), name='comment-vote'),
+
 
 ]
 
