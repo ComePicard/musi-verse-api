@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from api_musi.user.views import CreateUserAPIView
+#from api_musi.user.views import CreateUserAPIView
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
@@ -24,10 +24,13 @@ from rest_framework_simplejwt.views import (
 )
 
 import article.views
+
+import user.views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('users/', CreateUserAPIView.as_view(), name='create_user'),
+    path('users/', user.views.CreateUserAPIView.as_view(), name='create_user'),
     path('articles/image/', article.views.UploadImageToArticle.as_view()),
     path('articles/', article.views.ArticleAPIView.as_view()),
     path('articles/<str:route>', article.views.ArticleNamesAPIView.as_view()),
@@ -37,7 +40,8 @@ urlpatterns = [
     path('attributes/', article.views.CreateAttribute.as_view()),
     path('attributes/set/', article.views.SetAttribute.as_view()),
     path('attributes/vote/', article.views.AttributeVoteAPIView.as_view()),
-    path('attributes/<int:attribute_id>/', article.views.SetAttribute.as_view(), name='delete-attribute')
+    path('attributes/<int:attribute_id>/', article.views.SetAttribute.as_view(), name='delete-attribute'),
+    path('articles/<str:route>/comments/',article.views.CommentDetailView.as_view(), name='comment-detail'),
 
 ]
 
