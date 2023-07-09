@@ -31,6 +31,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('users/', user.views.CreateUserAPIView.as_view(), name='create_user'),
+    path('moderators/', user.views.ModeratorMembersView.as_view(), name='get_mods'),
+    path('moderators/admin/', user.views.ModeratorAdminView.as_view(), name='create_mod'),
     path('articles/image/', article.views.UploadImageToArticle.as_view()),
     path('articles/', article.views.ArticleAPIView.as_view()),
     path('articles/<str:route>', article.views.ArticleNamesAPIView.as_view()),
