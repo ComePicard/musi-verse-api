@@ -1,4 +1,5 @@
 import rest_framework.views
+from django.contrib.auth.models import User
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -7,9 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
-from .models import Article, Image, Attribute, ArticleAttribute, AttributeNote
+from .auto_mod import is_ban_word, is_toxic, is_spam
+from .models import Article, Image, Attribute, ArticleAttribute, AttributeNote, CommentVote, Comment
 
 import json
+
+from .serializers import CommentSerializer
 
 
 class ArticleNamesAPIView(APIView):
@@ -211,3 +215,48 @@ class AttributeVoteAPIView(APIView):
         attribute_note.save()
 
         return Response({'message': 'Vote recorded successfully.'})
+
+
+class CommentDetailView(APIView):
+    def get(self, request, route):
+        # Retrieve comments for the specified article
+        article = Article.objects.get(route=route)
+        comments = Comment.objects.filter(article=article)
+
+        comments_data = []
+        for comment in comments:
+            # Count upvotes and downvotes for each comment
+            upvotes = CommentVote.objects.filter(comment=comment, upvote=True).count()
+            downvotes = CommentVote.objects.filter(comment=comment, downvote=True).count()
+
+            comment_data = {
+                'comment_id': comment.id,
+                'content': comment.description,
+                'upvotes': upvotes,
+                'downvotes': downvotes
+            }
+            comments_data.append(comment_data)
+
+        return Response(comments_data)
+    def post(self, request, route):
+        permission_classes = (permissions.IsAuthenticated,)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            title = request.data.get('title')
+            description = request.data.get('description')
+            comment = f"{title} : {description}"
+            if not is_spam(comment):
+                if not is_ban_word(comment):
+                    if not is_toxic(comment):
+                        article_id = Article.objects.get(route=route).id
+                        user = User.objects.get(id = request.user.id)
+                        serializer.save(article_id=article_id, user=user)
+                        return Response(serializer.data, status=201)
+                    else:
+                        return Response("Commentaire toxique", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
+                else:
+                    return Response("Commentaire avec un mot banni", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
+            else:
+                return Response("Commentaire est un spam", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
+        return Response(serializer.errors, status=400)

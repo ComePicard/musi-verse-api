@@ -90,3 +90,40 @@ class AttributeNote(models.Model):
             self.downvote = False
 
         super().save(*args, **kwargs)
+
+
+class Comment(models.Model):
+    class Meta:
+        app_label = 'article'
+
+    ATTRIBUTE_CHOICES = [
+        ('unch', 'Unchecked'),
+        ('flag', 'Flagged'),
+        ('ban', 'Banned'),
+        ('chec', 'Checked'),
+    ]
+    status = models.CharField(max_length=4, choices=ATTRIBUTE_CHOICES,default='unch')
+    title = models.CharField(max_length=64)
+    description = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, null=False)
+    creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Date and time when the comment was published")
+    last_update = models.DateTimeField(auto_now=True, verbose_name="Last Update")
+
+
+class CommentVote(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    upvote = models.BooleanField(default=False)
+    downvote = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.upvote and self.downvote:
+            self.upvote = False
+        elif not self.upvote and not self.downvote:
+            self.downvote = False
+
+        super().save(*args, **kwargs)
+
+
+
