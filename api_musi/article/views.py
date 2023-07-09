@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
+from .admin import is_user_mod
 from .auto_mod import is_ban_word, is_toxic, is_spam
 from .models import Article, Image, Attribute, ArticleAttribute, AttributeNote, CommentVote, Comment
 
@@ -89,8 +90,7 @@ class ArticleAPIView(APIView):
     def patch(self, request):
         permission_classes = (permissions.IsAuthenticated,)
 
-        # if request.user.is_superuser or request.user.groups.filter(name='Moderators').exists():
-        if True:
+        if is_user_mod(request.user) or request.user.is_superuser:
             article_id = request.data.get('article_id')
             article = Article.objects.get(id=article_id)
             article.verified = True
@@ -123,13 +123,15 @@ class UploadImageToArticle(APIView):
 
 
 class CreateAttribute(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
     def post(self, request):
         try:
-            content = request.data.get('content')
-            attribute = Attribute()
-            attribute.content = content
-            attribute.save()
-            return Response('Added ' + content, status=status.HTTP_200_OK)
+            if is_user_mod(request.user) or request.user.is_superuser:
+                content = request.data.get('content')
+                attribute = Attribute()
+                attribute.content = content
+                attribute.save()
+                return Response('Added ' + content, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response('Already exists', status=status.HTTP_409_CONFLICT)
@@ -173,7 +175,7 @@ class SetAttribute(APIView):
             art_attribute = ArticleAttribute.objects.get(id=attribute_id)
             total_upvotes = AttributeNote.objects.filter(article_attribute=art_attribute.id, upvote=True).count()
             total_downvotes = AttributeNote.objects.filter(article_attribute=art_attribute.id, downvote=True).count()
-            if art_attribute.user == request.user and total_downvotes + total_downvotes < 3:
+            if (art_attribute.user == request.user and total_downvotes + total_upvotes < 3) or is_user_mod(request.user):
                 art_attribute.delete()
                 return Response('Attribute deleted successfully', status=status.HTTP_200_OK)
         except ArticleAttribute.DoesNotExist:
