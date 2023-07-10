@@ -41,6 +41,7 @@ class ArticleNamesAPIView(APIView):
         return Response([article_dict, article_attributes])
 
 
+
 class ArticleAPIView(APIView):
     def post(self, request):
         permission_classes = (permissions.IsAuthenticated,)
@@ -87,6 +88,35 @@ class ArticleAPIView(APIView):
             result.append([model_to_dict(article), article_attributes])
         return Response(result)
 
+
+
+class ArticleModView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def get(self, request):
+
+        if not is_user_mod(request.user) or not request.user.is_superuser:
+            return Response('Not authorized',status=status.HTTP_401_UNAUTHORIZED)
+
+        articles = Article.objects.all().filter(verified=False)
+        result = []
+
+        for article in articles:
+            attrs = ArticleAttribute.objects.all().filter(article=article.id)
+
+            article_attributes = []
+            for art_attr in attrs:
+                attrs_vote = AttributeNote.objects.all().filter(article_attribute=art_attr.id)
+                total_upvotes = AttributeNote.objects.filter(article_attribute=art_attr.id, upvote=True).count()
+                total_downvotes = AttributeNote.objects.filter(article_attribute=art_attr.id, downvote=True).count()
+
+                article_attributes.append({"attribute_name": Attribute.objects.get(id=art_attr.attr.id).content,
+                                           "article_attribute": model_to_dict(art_attr),
+                                           "article_votes": {"votes_diff": total_upvotes - total_downvotes,
+                                                             "downvotes": total_downvotes,
+                                                             "upvotes": total_upvotes}})
+
+            result.append([model_to_dict(article), article_attributes])
+        return Response(result)
     def patch(self, request):
         permission_classes = (permissions.IsAuthenticated,)
 

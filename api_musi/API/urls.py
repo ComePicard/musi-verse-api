@@ -35,6 +35,7 @@ urlpatterns = [
     path('moderators/add/', user.views.ModeartorAdd.as_view(), name='mode_add'),
     path('moderators/remove/', user.views.ModeartorRemove.as_view(), name='mod_rem'),
     path('articles/image/', article.views.UploadImageToArticle.as_view()),
+    path('articles/verify/', article.views.ArticleModView.as_view()),
     path('articles/', article.views.ArticleAPIView.as_view()),
     path('articles/<str:route>', article.views.ArticleNamesAPIView.as_view()),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
