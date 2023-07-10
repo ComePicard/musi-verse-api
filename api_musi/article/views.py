@@ -80,8 +80,8 @@ class ArticleAPIView(APIView):
 
                 article_attributes.append({"attribute_name": Attribute.objects.get(id=art_attr.attr.id).content,
                                            "article_attribute": model_to_dict(art_attr),
-                                           "article_votes": {"votes_diff" : total_upvotes - total_downvotes,
-                                                            "downvotes": total_downvotes,
+                                           "article_votes": {"votes_diff": total_upvotes - total_downvotes,
+                                                             "downvotes": total_downvotes,
                                                              "upvotes": total_upvotes}})
 
             result.append([model_to_dict(article), article_attributes])
@@ -124,6 +124,7 @@ class UploadImageToArticle(APIView):
 
 class CreateAttribute(APIView):
     permission_classes = (permissions.IsAuthenticated,)
+
     def post(self, request):
         try:
             if is_user_mod(request.user) or request.user.is_superuser:
@@ -175,7 +176,8 @@ class SetAttribute(APIView):
             art_attribute = ArticleAttribute.objects.get(id=attribute_id)
             total_upvotes = AttributeNote.objects.filter(article_attribute=art_attribute.id, upvote=True).count()
             total_downvotes = AttributeNote.objects.filter(article_attribute=art_attribute.id, downvote=True).count()
-            if (art_attribute.user == request.user and total_downvotes + total_upvotes < 3) or is_user_mod(request.user):
+            if (art_attribute.user == request.user and total_downvotes + total_upvotes < 3) or is_user_mod(
+                    request.user):
                 art_attribute.delete()
                 return Response('Attribute deleted successfully', status=status.HTTP_200_OK)
         except ArticleAttribute.DoesNotExist:
@@ -240,6 +242,7 @@ class CommentDetailView(APIView):
             comments_data.append(comment_data)
 
         return Response(comments_data)
+
     def post(self, request, route):
         permission_classes = (permissions.IsAuthenticated,)
 
@@ -248,20 +251,19 @@ class CommentDetailView(APIView):
             title = request.data.get('title')
             description = request.data.get('description')
             comment = f"{title} : {description}"
-            if not is_spam(comment):
-                if not is_ban_word(comment):
-                    if not is_toxic(comment):
-                        article_id = Article.objects.get(route=route).id
-                        user = User.objects.get(id = request.user.id)
-                        serializer.save(article_id=article_id, user=user)
-                        return Response(serializer.data, status=201)
-                    else:
-                        return Response("Commentaire toxique", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
-                else:
-                    return Response("Commentaire avec un mot banni", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
-            else:
+            if is_spam(comment):
                 return Response("Commentaire est un spam", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
+            if is_ban_word(comment):
+                return Response("Commentaire avec un mot banni", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
+            if is_toxic(comment):
+                return Response("Commentaire toxique", status=rest_framework.status.HTTP_406_NOT_ACCEPTABLE)
+            article_id = Article.objects.get(route=route).id
+            user = User.objects.get(id=request.user.id)
+            serializer.save(article_id=article_id, user=user)
+            return Response(serializer.data, status=201)
+
         return Response(serializer.errors, status=400)
+
 
 class CommentVoteAPIView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
