@@ -9,7 +9,8 @@ from django.db import models
 class Article(models.Model):
     class Meta:
         app_label = 'article'
-    name = models.CharField(default=['ArticleDefault'], max_length=200,unique=True)
+
+    name = models.CharField(default=['ArticleDefault'], max_length=200, unique=True)
     CORDES_PINCEES = "Cordes pincées"
     CORDES_FROTTEES = "Cordes frottées"
     VENTS = "Vents"
@@ -37,8 +38,8 @@ class Article(models.Model):
     )
     creation_date = models.DateTimeField(db_comment="Date and time when the article was published", auto_now_add=True)
     last_update = models.DateTimeField(db_comment="Last Update", auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
-    route = models.CharField(default=['route'], max_length=200,unique=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    route = models.CharField(default=['route'], max_length=200, unique=True)
     views = models.PositiveIntegerField(default=0)
     verified = models.BooleanField(default=False)
 
@@ -46,21 +47,23 @@ class Article(models.Model):
 class Image(models.Model):
     class Meta:
         app_label = 'article'
+
     image = models.ImageField(upload_to="./images/instruments")
     name = models.CharField(default=['ImageDefault'], max_length=200, unique=True)
     description = models.TextField(max_length=10000,
                                    default="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 
-
     creation_date = models.DateTimeField(db_comment="Date and time when the image was published", auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, default=None)
+
 
 class Attribute(models.Model):
     class Meta:
         app_label = 'article'
 
     content = models.TextField(unique=True)
+
 
 class ArticleAttribute(models.Model):
     ATTRIBUTE_CHOICES = [
@@ -69,7 +72,7 @@ class ArticleAttribute(models.Model):
     ]
 
     attr = models.ForeignKey(Attribute, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE,default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     attribute_type = models.CharField(max_length=4, choices=ATTRIBUTE_CHOICES)
 
@@ -102,8 +105,7 @@ class Comment(models.Model):
         ('ban', 'Banned'),
         ('chec', 'Checked'),
     ]
-    status = models.CharField(max_length=4, choices=ATTRIBUTE_CHOICES,default='unch')
-    title = models.CharField(max_length=64)
+    status = models.CharField(max_length=4, choices=ATTRIBUTE_CHOICES, default='unch')
     description = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, null=False)
@@ -124,6 +126,3 @@ class CommentVote(models.Model):
             self.downvote = False
 
         super().save(*args, **kwargs)
-
-
-
