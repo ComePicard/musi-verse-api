@@ -30,7 +30,8 @@ import user.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('users/', user.views.CreateUserAPIView.as_view(), name='create_user'),
+    path('users/', user.views.UserAPI.as_view(), name='create_user / get'),
+    path('users/<str:username>/', user.views.GetUserByUsername.as_view(), name='user'),
     path('moderators/', user.views.ModeratorMembersView.as_view(), name='get_mods'),
     path('moderators/add/', user.views.ModeartorAdd.as_view(), name='mode_add'),
     path('moderators/remove/', user.views.ModeartorRemove.as_view(), name='mod_rem'),
