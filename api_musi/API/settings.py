@@ -90,7 +90,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'pwd',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
 SITE_ID = 1

@@ -43,14 +43,15 @@ class ArticleNamesAPIView(APIView):
 
 
 class ArticleAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
     def post(self, request):
-        permission_classes = (permissions.IsAuthenticated,)
+
 
         name = request.data.get('name')
         categories = request.data.get('categories')
         description = request.data.get('description')
         price_range = request.data.get('price_range')
-
+        user = User.objects.get(id=1)
         # TODO: Perform data validation
 
         new_article = Article(
@@ -59,7 +60,7 @@ class ArticleAPIView(APIView):
             description=description,
             price_range=price_range,
             route=name.strip().replace(" ", "_").lower(),
-            author=request.user
+            author=user
         )
         new_article.save()
         return Response(f"Article {name} created")
@@ -93,8 +94,8 @@ class ArticleAPIView(APIView):
 class ArticleModView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request):
-
-        if not is_user_mod(request.user) or not request.user.is_superuser:
+        print(is_user_mod(request.user))
+        if not is_user_mod(request.user) and not request.user.is_superuser:
             return Response('Not authorized',status=status.HTTP_401_UNAUTHORIZED)
 
         articles = Article.objects.all().filter(verified=False)
@@ -263,7 +264,11 @@ class CommentDetailView(APIView):
             upvotes = CommentVote.objects.filter(comment=comment, upvote=True).count()
             downvotes = CommentVote.objects.filter(comment=comment, downvote=True).count()
 
+
             comment_data = {
+                "status" : comment.status,
+                "creation_date" : comment.creation_date,
+                "author" : comment.user.username,
                 'comment_id': comment.id,
                 'content': comment.description,
                 'upvotes': upvotes,
