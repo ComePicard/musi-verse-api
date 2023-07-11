@@ -3,7 +3,8 @@ import re
 from googletrans import Translator
 from nltk.sentiment import SentimentIntensityAnalyzer
 
-from api_musi.article import MODERATION_VAL
+MODERATION_VAL = -0.5
+
 
 file = open(r"../sources/banwords.txt").readlines()
 banwords = []
