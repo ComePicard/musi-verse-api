@@ -17,15 +17,23 @@ Docker de test :
 
 Une connexion à la DB par un moyen quelconque et : 
 `CREATE DATABASE MUSIVERSE_DB`
+Dans un terminal en mode administrateur / sudo
+`python`
+Dans la console python :
+`import nltk`
+`nltk.download()`
+Choisir all et télécharger la data pour l'analyse de sentiment
 
+Quitter le terminal admin
+`cd api_musi`
 
-`python api_musi/manage.py makemigrations`
+`python manage.py makemigrations`
 
-`python api_musi/manage.py migrate`
+`python manage.py migrate`
 
-`python api_musi/manage.py  createsuperuser --email admin@example.com --username admin`
+`python manage.py  createsuperuser --email admin@example.com --username admin`
 
-`python api_musi/manage.py runserver 8000`
+`python manage.py runserver 8000`
 
 se rendre sur http://127.0.0.1:8000/admin/ et tester admin puis {mot de passe} pour voir si la page d'administration apparaît
 

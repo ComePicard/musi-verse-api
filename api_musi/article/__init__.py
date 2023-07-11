@@ -1,2 +1,1 @@
 MODERATION_VAL = -0.2
-

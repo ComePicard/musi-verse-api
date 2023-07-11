@@ -1,13 +1,11 @@
 import re
-from os import listdir
 
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
 from googletrans import Translator
+from nltk.sentiment import SentimentIntensityAnalyzer
 
+from api_musi.article import MODERATION_VAL
 
-
-file = open(r"C:\Users\comep\PycharmProjects\musi_verse_api\sources\banwords.txt").readlines()
+file = open(r"../sources/banwords.txt").readlines()
 banwords = []
 for line in file:
     banwords.append(line.strip())
@@ -21,16 +19,13 @@ def translate_text(text, src_lang, dest_lang):
 
 def is_toxic(comment):
     translated_comment = translate_text(comment, 'fr', 'en')
-
     sid = SentimentIntensityAnalyzer()
     sentiment_scores = sid.polarity_scores(translated_comment)
     print("Scores de sentiment :", sentiment_scores)
-
-    if sentiment_scores['compound'] < -0.5:
+    if sentiment_scores['compound'] < MODERATION_VAL:
         return True
     else:
         return False
-
 
 def is_ban_word(comment):
     for banw in banwords:
